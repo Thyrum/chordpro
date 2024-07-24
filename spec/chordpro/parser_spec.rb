@@ -66,7 +66,7 @@ describe Chordpro::Parser do
     it { should parse("{title:Royals}").as(directive: {name: "title", value: "Royals"}) }
     # FIXME: remove trailing space from value
     it { should parse("{ title : Get Lucky }").as(directive: {name: "title", value: "Get Lucky "}) }
-    it { should parse("{soc}").as(directive: {name: "soc"}) }
+    it { should_not parse("{soc}") }
     it { should_not parse("{st:oops") }
   end
 
@@ -99,6 +99,33 @@ describe Chordpro::Parser do
 
     it { should parse("words with a newline\n").as(line: [{lyric: "words with a newline"}]) }
     it { should_not parse("foo\nbar") }
+  end
+
+  describe "environment" do
+    it { should parse("{soc}\nHello World!\n{eoc}").as({
+      environment: {
+        start_environment: {
+          start_directive: {name: "soc"}
+        },
+        body: [
+          line: [lyric: "Hello World!"]
+        ],
+        end_environment: {
+          end_directive: {name: "eoc"}
+        }
+      }
+    })}
+    it { should parse("{start_of_verse: Verse 1}\n{eov}").as({
+      environment: {
+        start_environment: {
+          start_directive: {name: "start_of_verse", value: "Verse 1"}
+        },
+        body: [],
+        end_environment: {
+          end_directive: {name: "eov"}
+        }
+      }
+    })}
   end
 
   describe "song" do

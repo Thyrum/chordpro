@@ -4,7 +4,7 @@ body {
   padding: 20px;
 }
 
-.comment {
+.comment, .environment-title {
   color: #999;
 }
 
