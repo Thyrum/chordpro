@@ -12,6 +12,9 @@ module Chordpro
     rule(:rbracket) { str("]") }
 
     rule(:identifier) { match["a-z"].repeat(1) }
+    rule(:start_identifier) { str("so") >> match["a-z"] | str("start_of_") >> identifier }
+    rule(:end_identifier) { str("eo") >> match["a-z"] | str("end_of_") >> identifier }
+
     rule(:value) { (rbrace.absent? >> any).repeat }
 
     rule(:comment) { str("#") >> (newline.absent? >> any).repeat >> newline.maybe }
@@ -19,6 +22,8 @@ module Chordpro
     rule(:directive) do
       (
         lbrace >> space >>
+        str("so").absent? >> str("start_of_").absent? >>
+        str("eo").absent? >> str("end_of_").absent? >>
         identifier.as(:name) >>
         (
           colon >>
@@ -27,11 +32,36 @@ module Chordpro
         rbrace
       ).as(:directive) >> newline.maybe
     end
+    rule(:start_directive) do
+      (
+        lbrace >> space >>
+        start_identifier.as(:name) >>
+        (
+          colon >>
+          value.as(:value)
+        ).maybe >>
+        rbrace
+      ).as(:start_directive) >> newline.maybe
+    end
+    rule(:end_directive) do
+      (
+        lbrace >> space >>
+        end_identifier.as(:name) >>
+        rbrace
+      ).as(:end_directive) >> newline.maybe
+    end
+    rule(:environment) do
+      (
+        start_directive.as(:start_environment) >>
+        (comment | directive | newline.as(:linebreak) | line).repeat.as(:body) >>
+        end_directive.as(:end_environment)
+      ).as(:environment)
+    end
     rule(:chord) { lbracket >> (rbracket.absent? >> any).repeat.as(:chord) >> rbracket }
     rule(:lyric) { (lbracket.absent? >> newline.absent? >> any).repeat(1).as(:lyric) }
-    rule(:line) { (chord | lyric).repeat(1).as(:line) >> newline.maybe }
+    rule(:line) { lbrace.absent? >> (chord | lyric).repeat(1).as(:line) >> newline.maybe }
 
-    rule(:song) { (comment | directive | newline.as(:linebreak) | line).repeat.as(:song) }
+    rule(:song) { (environment | comment | directive | newline.as(:linebreak) | line).repeat.as(:song) }
 
     root(:song)
   end

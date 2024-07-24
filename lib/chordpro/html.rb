@@ -71,5 +71,13 @@ module Chordpro
       @html.span(text, class: "comment")
     end
     alias_method :c, :comment
+
+    def start_environment(type, title)
+      if title.nil? || title.empty?
+        @html.span(type.capitalize, class: "environment-title")
+      else
+        @html.span(title, class: "environment-title")
+      end
+    end
   end
 end

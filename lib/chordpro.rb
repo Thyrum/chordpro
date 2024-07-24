@@ -1,3 +1,4 @@
+require "chordpro/environment"
 require "chordpro/chord"
 require "chordpro/directive"
 require "chordpro/html"
