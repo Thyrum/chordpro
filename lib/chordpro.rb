@@ -2,6 +2,7 @@ require "chordpro/environment"
 require "chordpro/chord"
 require "chordpro/directive"
 require "chordpro/html"
+require "chordpro/flexhtml"
 require "chordpro/line"
 require "chordpro/linebreak"
 require "chordpro/lyric"
@@ -20,5 +21,9 @@ module Chordpro
 
   def self.html(string)
     HTML.new(parse(string)).to_s
+  end
+
+  def self.flexhtml(string)
+    FlexHTML.new(parse(string)).to_s
   end
 end

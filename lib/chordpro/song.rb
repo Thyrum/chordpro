@@ -8,7 +8,13 @@ module Chordpro
     end
 
     def accept(visitor)
+      if visitor.respond_to?(:start_song)
+        visitor.start_song()
+      end
       elements.map { |element| element.accept(visitor) }
+      if visitor.respond_to?(:end_song)
+        visitor.end_song()
+      end
     end
 
     def method_missing(method, *args)
