@@ -18,7 +18,6 @@ module Chordpro
     rule(:value) { (rbrace.absent? >> any).repeat }
 
     rule(:comment) { str("#") >> (newline.absent? >> any).repeat >> newline.maybe }
-    rule(:ly_body) { ((end_ly.absent? >> (any | newline)).repeat).as(:ly_body) }
 
     rule(:directive) do
       (
@@ -61,12 +60,35 @@ module Chordpro
         lbrace >> space >> str("end_of_ly").as(:name) >> rbrace
       ).as(:end_directive) >> newline.maybe
     end
+    rule(:ly_body) { ((end_ly.absent? >> (any | newline)).repeat).as(:ly_body) }
     rule(:ly_environment) do
       (
         start_ly.as(:start_environment) >>
         ly_body.as(:ly_body) >>
         end_ly.as(:end_environment)
       ).as(:ly_environment)
+    end
+    rule(:start_abc) do
+      (
+        lbrace >> space >> str("start_of_abc").as(:name) >>
+        (
+          colon >> value.as(:value)
+        ).maybe >>
+        rbrace
+      ).as(:start_directive) >> newline.maybe
+    end
+    rule(:end_abc) do
+      (
+        lbrace >> space >> str("end_of_abc").as(:name) >> rbrace
+      ).as(:end_directive) >> newline.maybe
+    end
+    rule(:abc_body) { ((end_abc.absent? >> (any | newline)).repeat).as(:abc_body) }
+    rule(:abc_environment) do
+      (
+        start_abc.as(:start_environment) >>
+        abc_body.as(:abc_body) >>
+        end_abc.as(:end_environment)
+      ).as(:abc_environment)
     end
 
     rule(:environment) do
@@ -81,7 +103,7 @@ module Chordpro
     rule(:lyric) { (lbracket.absent? >> newline.absent? >> any).repeat(1).as(:lyric) }
     rule(:line) { lbrace.absent? >> (chord | lyric).repeat(1).as(:line) >> newline.maybe }
 
-    rule(:song) { (ly_environment | environment | comment | directive | newline.as(:linebreak) | line).repeat.as(:song) }
+    rule(:song) { (ly_environment | abc_environment | environment | comment | directive | newline.as(:linebreak) | line).repeat.as(:song) }
 
     root(:song)
   end

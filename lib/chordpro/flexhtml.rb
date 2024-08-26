@@ -89,12 +89,14 @@ module Chordpro
 			end
 
 			@environment.div(class: "line") do |lineDiv|
-				lyrics.size.times do |i|
+				chords.size.times do |i|
 					lineDiv.div(class: "part") do |partDiv|
 						unless chords[i] == ""
 							partDiv.div(chords[i], class: "chord")
 						end
-						partDiv.div(lyrics[i], class: "lyric")
+						if lyrics[i]
+							partDiv.div(lyrics[i], class: "lyric")
+						end
 					end
 				end
 			end
@@ -124,9 +126,11 @@ module Chordpro
 		end
 
 		def ly_body(body)
-			@environment.div(class: "lilypond") do |lilyDiv|
-				lilyDiv.div(body, class: "code")
-			end
+			@environment.div(body, class: "code")
+		end
+
+		def abc_body(body)
+			@environment.div(body, class: "code")
 		end
 
 		def start_song()

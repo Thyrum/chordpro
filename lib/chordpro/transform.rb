@@ -27,6 +27,16 @@ module Chordpro
       Chordpro::Environment.new(start_environment, [ly_body], end_environment)
     end
 
+    rule(abc_body: simple(:abc_body)) { Chordpro::ABCBody.new(abc_body.to_s) }
+    rule(abc_environment: {
+      start_environment: simple(:start_environment),
+      abc_body: simple(:abc_body),
+      end_environment: simple(:end_environment)
+    }) do
+      print abc_body
+      Chordpro::Environment.new(start_environment, [abc_body], end_environment)
+    end
+
     rule(environment: {
         start_environment: simple(:start_environment),
         body: subtree(:body),

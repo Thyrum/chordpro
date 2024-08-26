@@ -34,4 +34,16 @@ module Chordpro
       end
     end
   end
+
+  class ABCBody < Struct.new(:body)
+    def initialize(body)
+      super(body)
+    end
+
+    def accept(visitor)
+      if visitor.respond_to?("abc_body")
+        visitor.abc_body(body)
+      end
+    end
+  end
 end
