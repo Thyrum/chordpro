@@ -6,19 +6,32 @@ module Chordpro
 
     def accept(visitor)
       result = []
-      if visitor.respond_to?(type.to_s)
-        result.append(visitor.send(type.to_s, title))
+      start_type = "start_of_" + type.to_s
+      if visitor.respond_to?(start_type)
+        result.append(visitor.send(start_type, title))
       else
         result.append(visitor.start_environment(type.to_s, title))
       end
       result.append(body.map { |element| element.accept(visitor) })
-      end_type = "end_" + type.to_s
+      end_type = "end_of_" + type.to_s
       if visitor.respond_to?(end_type)
         result.append(visitor.send(end_type, title))
       elsif visitor.respond_to?("end_environment")
         result.append(visitor.end_environment(type.to_s, title))
       end
       result
+    end
+  end
+
+  class LyBody < Struct.new(:body)
+    def initialize(body)
+      super(body)
+    end
+
+    def accept(visitor)
+      if visitor.respond_to?("ly_body")
+        visitor.ly_body(body)
+      end
     end
   end
 end

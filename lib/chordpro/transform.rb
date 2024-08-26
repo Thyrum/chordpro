@@ -17,6 +17,16 @@ module Chordpro
       end
     end
 
+    rule(ly_body: simple(:ly_body)) { Chordpro::LyBody.new(ly_body.to_s) }
+    rule(ly_environment: {
+      start_environment: simple(:start_environment),
+      ly_body: simple(:ly_body),
+      end_environment: simple(:end_environment)
+    }) do
+      print ly_body
+      Chordpro::Environment.new(start_environment, [ly_body], end_environment)
+    end
+
     rule(environment: {
         start_environment: simple(:start_environment),
         body: subtree(:body),

@@ -74,14 +74,14 @@ module Chordpro
 
 					# If no chord was provided, enter a nbsp
 					unless chords[lyrics.size]
-						chords[lyrics.size] = "\u00A0"
+						chords[lyrics.size] = line.parts.size == 1 ? "" : "\u00A0"
 					end
 					lyrics << lyric
 				elsif element.is_a?(Chord)
 					chord = element.to_s + "\u00A0\u00A0"
 					if chords[lyrics.size]
 						chords << chord
-						lyrics << nil
+						lyrics << ""
 					else
 						chords[lyrics.size] = chord
 					end
@@ -91,7 +91,9 @@ module Chordpro
 			@environment.div(class: "line") do |lineDiv|
 				lyrics.size.times do |i|
 					lineDiv.div(class: "part") do |partDiv|
-						partDiv.div(chords[i], class: "chord")
+						unless chords[i] == ""
+							partDiv.div(chords[i], class: "chord")
+						end
 						partDiv.div(lyrics[i], class: "lyric")
 					end
 				end
@@ -119,6 +121,12 @@ module Chordpro
 				div << @environment.target!
 			end
 			@environment = @body
+		end
+
+		def ly_body(body)
+			@environment.div(class: "lilypond") do |lilyDiv|
+				lilyDiv.div(body, class: "code")
+			end
 		end
 
 		def start_song()
